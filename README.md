@@ -6,8 +6,13 @@ A drop-in JWT authentication implementation to used with [FastAPI Users](https:/
 
 Allows the user to implement JWT authentication in any FastAPI application.
 
-## Releases
+## Changelog
 
-2020-12-25: Making the AuthControl folder in the *auth-demo* app into its own git repo. Merry Christmas everyone!
+### v0.1 (December 25, 2020)
+
+Making the AuthControl folder in the *auth-demo* app into its own git repo. Merry Christmas everyone!
 
 
+## License
+
+[GNU](https://www.gnu.org/licenses/)
