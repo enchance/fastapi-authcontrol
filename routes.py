@@ -8,7 +8,7 @@ from tortoise.exceptions import DoesNotExist
 
 from app.settings import settings as s
 from . import fapi_user, signup_callback
-from core.dependencies import unique_username, unique_email
+from app.core.dependencies import unique_username, unique_email
 from app.AdminControl.models import UniqueFieldsRegistration
 from app.AuthControl import jwt_authentication, user_db, AuthControl
 from app.AuthControl.models import UserMod, Token

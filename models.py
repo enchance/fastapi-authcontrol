@@ -3,7 +3,7 @@ from fastapi_users import models
 from fastapi_users.db import TortoiseBaseUserModel
 from tortoise import fields, models as tmodels
 
-from core.utils import model_str
+from app.core.utils import model_str
 
 
 
