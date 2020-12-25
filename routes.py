@@ -28,7 +28,7 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
     
     The refresh_token is renewed for every login to prevent accidental logouts.
     """
-    cutoff_mins = 3
+    cutoff_mins = 30
     try:
         if refresh_token is None:
             raise Exception
