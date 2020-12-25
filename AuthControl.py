@@ -32,9 +32,9 @@ class AuthControl:
     
         return {
             'days': diff.days,
-            'hours': diff.seconds // 3600,
-            'minutes': (diff.seconds // 60) % 60,
-            'seconds': diff.seconds,
+            'hours': int(diff.total_seconds()) // 3600,
+            'minutes': int(diff.total_seconds()) // 60,
+            'seconds': int(diff.total_seconds()),
         }
     
     @classmethod
@@ -51,10 +51,10 @@ class AuthControl:
             'path': '/',
             **kwargs,
         }
-        if not s.DEBUG:
-            cookie_data.update({
-                'secure': True
-            })
+        # if not s.DEBUG:
+        #     cookie_data.update({
+        #         'secure': True
+        #     })
         return cookie_data
         
     @classmethod
