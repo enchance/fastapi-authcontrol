@@ -28,7 +28,7 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
     
     The refresh_token is renewed for every login to prevent accidental logouts.
     """
-    cutoff_mins = 30
+    cutoff_mins = 3
     try:
         if refresh_token is None:
             raise Exception
@@ -47,24 +47,13 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
                 token = await AuthControl.update_refresh_token(user)
             except DoesNotExist:
                 token = await AuthControl.create_refresh_token(user)
-            # token = {
-            #     'value': 'FOOBAR',
-            #     'expires': datetime(2020, 12, 30, 15)
-            # }
 
             cookie = AuthControl.refresh_cookie(s.REFRESH_TOKEN_KEY, token)
             response.set_cookie(**cookie)
 
-        data = await jwt_authentication.get_login_response(user, response)
-        data.update({
-            'mins': mins,
-            'type': type(mins),
-            'expires': token.expires,
-            'now': datetime.utcnow(),
-        })
-        return data
+        return await jwt_authentication.get_login_response(user, response)
     
-    except (DoesNotExist, Exception) as e:
+    except (DoesNotExist, Exception):
         del response.headers['authorization']
         response.delete_cookie(s.REFRESH_TOKEN_KEY)
         return dict(access_token='')
