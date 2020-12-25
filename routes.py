@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Response, Depends, status, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
@@ -40,17 +41,28 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
         mins = AuthControl.expires(token.expires)
         if mins <= 0:
             raise Exception
-        elif mins < cutoff_mins:
+        elif mins <= cutoff_mins:
             # refresh the refresh_token anyway before it expires
             try:
                 token = await AuthControl.update_refresh_token(user)
             except DoesNotExist:
                 token = await AuthControl.create_refresh_token(user)
+            # token = {
+            #     'value': 'FOOBAR',
+            #     'expires': datetime(2020, 12, 30, 15)
+            # }
 
             cookie = AuthControl.refresh_cookie(s.REFRESH_TOKEN_KEY, token)
             response.set_cookie(**cookie)
 
-        return await jwt_authentication.get_login_response(user, response)
+        data = await jwt_authentication.get_login_response(user, response)
+        data.update({
+            'mins': mins,
+            'type': type(mins),
+            'expires': token.expires,
+            'now': datetime.utcnow(),
+        })
+        return data
     
     except (DoesNotExist, Exception) as e:
         del response.headers['authorization']
