@@ -1,12 +1,11 @@
-from gettext import gettext as _
-from typing import Optional
-from pydantic import validator, ValidationError, BaseModel
+from pydantic import BaseModel
 from fastapi_users import models
 from fastapi_users.db import TortoiseBaseUserModel
-from tortoise import fields, transactions, models as tmodels
+from tortoise import fields, models as tmodels
 
-from core.exceptions import x_username_exists_400
 from core.utils import model_str
+
+
 
 """
 DB
@@ -76,7 +75,7 @@ class Token(tmodels.Model):
     is_blacklisted = fields.BooleanField(default=False)
     author = fields.ForeignKeyField('models.UserMod', on_delete=fields.CASCADE,
                                     related_name='tokens_author')
-    created_at = fields.DatetimeField(auto_now_add=True)
+    # created_at = fields.DatetimeField(auto_now_add=True)
     
     class Meta:
         table = 'auth_token'
