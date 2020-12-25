@@ -24,6 +24,18 @@ class AuthControl:
     @staticmethod
     def generate_refresh_token(nbytes: int = 32):
         return secrets.token_hex(nbytes=nbytes)
+
+    @staticmethod
+    def time_difference(*, start: datetime, end: datetime):
+        """Get the diff between 2 dates"""
+        diff = end - start
+    
+        return {
+            'days': diff.days,
+            'hours': diff.seconds // 3600,
+            'minutes': (diff.seconds // 60) % 60,
+            'seconds': diff.seconds,
+        }
     
     @classmethod
     def refresh_cookie(cls, name: str, token: dict, **kwargs):
@@ -44,22 +56,11 @@ class AuthControl:
                 'secure': True
             })
         return cookie_data
-    
-    @classmethod
-    def _time_difference(cls, *, start: datetime, end: datetime):
-        diff = end - start
         
-        return {
-            'days': diff.days,
-            'hours': diff.seconds // 3600,
-            'minutes': (diff.seconds // 60) % 60,
-            'seconds': diff.seconds,
-        }
-    
     @classmethod
     def expires(cls, expires: datetime, units: str = 'minutes'):
         now = datetime.utcnow()
-        diff = cls._time_difference(start=now, end=expires)
+        diff = cls.time_difference(start=now, end=expires)
         return diff[units]
 
 
