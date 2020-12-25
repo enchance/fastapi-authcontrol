@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from fastapi_users import models
 from fastapi_users.db import TortoiseBaseUserModel
@@ -113,3 +115,20 @@ class UserDB(User, models.BaseUserDB):
 class TokenCreate(BaseModel):
     id: int
     token: str
+
+
+class OptionCreate(BaseModel):
+    name: str
+    value: str
+    user: Optional[UserDB]
+
+
+class OptionUpdate(BaseModel):
+    id: int
+    value: str
+    user: Optional[UserDB]
+
+
+class OptionDelete(BaseModel):
+    id: int
+    user: Optional[UserDB]
