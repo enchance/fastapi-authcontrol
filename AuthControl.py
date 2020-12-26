@@ -5,6 +5,8 @@ from enum import Enum
 from . import UserDB
 from .models import UserMod, Token
 from app.settings import settings as s
+from tortoise import models
+from app.core.utils import hmset, hmget
 
 
 class TimeUnits(Enum):
@@ -100,3 +102,23 @@ class AuthControl:
             'expires': expires,
         }
 
+
+    async def get_by_email(self, email: str):
+        user = await UserMod.get(email__iexact=email)\
+            .only('id', 'email', 'is_verified', 'is_active', 'is_superuser', 'is_staff',
+                  'first_name', 'last_name', 'timezone', 'hashed_password')
+        if not user:
+            return None
+        hmset(user.id, user)
+        return user
+        
+        
+    @property
+    async def user(self):
+        user = None
+        return user
+    
+    
+    @user.setter
+    async def user(self, user: UserMod):
+        pass

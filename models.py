@@ -33,6 +33,7 @@ class UserMod(TortoiseBaseUserModel):
     website =   fields.CharField(max_length=191, default='')
     
     is_verified = fields.BooleanField(default=False)
+    is_staff   = fields.BooleanField(default=False)
     last_login =  fields.DatetimeField(null=True)
     deleted_at =  fields.DatetimeField(null=True)
     updated_at =  fields.DatetimeField(auto_now=True)

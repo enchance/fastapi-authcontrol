@@ -19,6 +19,7 @@ jwt_authentication = JWTAuthentication(secret=s.SECRET_KEY, lifetime_seconds=s.A
 user_db = TortoiseUserDatabase(UserDB, UserMod)
 fapi_user = FastAPIUsers(user_db, [jwt_authentication], User, UserCreate, UserUpdate, UserDB) # noqa
 
+authcon = AuthControl()
 
 async def signup_callback(user: UserDB, request: Request):
     # Add groups to the new user
