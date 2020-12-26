@@ -28,7 +28,6 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
     
     The refresh_token is renewed for every login to prevent accidental logouts.
     """
-    cutoff_mins = 30
     try:
         if refresh_token is None:
             raise Exception
@@ -41,7 +40,7 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
         mins = AuthControl.expires(token.expires)
         if mins <= 0:
             raise Exception
-        elif mins <= cutoff_mins:
+        elif mins <= s.REFRESH_TOKEN_CUTOFF:
             # refresh the refresh_token anyway before it expires
             try:
                 token = await AuthControl.update_refresh_token(user)
