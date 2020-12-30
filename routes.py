@@ -1,8 +1,8 @@
-from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Response, Depends, status, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.exceptions import HTTPException
+
 from fastapi_users.router.common import ErrorCode
 from tortoise.exceptions import DoesNotExist
 
@@ -12,6 +12,7 @@ from app.core.dependencies import unique_username, unique_email
 from app.AdminControl.models import UniqueFieldsRegistration
 from app.AuthControl import jwt_authentication, user_db, AuthControl
 from app.AuthControl.models import UserMod, Token
+
 
 router = APIRouter()
 # router.include_router(fapi_user.get_auth_router(jwt_authentication))
@@ -60,8 +61,10 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
 
 @router.post("/login")
 async def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends()):
-    user = await fapi_user.db.authenticate(credentials)
-
+    user = await fapi_user.db.authenticate(credentials, ['id', 'username', 'email',
+                                                         'hashed_password', 'is_verified',
+                                                         'is_superuser', 'timezone'])
+    
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -79,8 +82,9 @@ async def login(response: Response, credentials: OAuth2PasswordRequestForm = Dep
     # TODO: Save user's permissions to cache
     # TODO: Save user's groups to cache
     # TODO: Save user data to cache
-
-    return await jwt_authentication.get_login_response(user, response)
+    data = {}
+    data.update(await jwt_authentication.get_login_response(user, response))
+    return data
 
 
 @router.get("/logout", dependencies=[Depends(fapi_user.get_current_active_user)])

@@ -5,8 +5,7 @@ from enum import Enum
 from . import UserDB
 from .models import UserMod, Token
 from app.settings import settings as s
-from tortoise import models
-from app.core.utils import hmset, hmget
+from app.core.util.redis.redis import hmset
 
 
 class TimeUnits(Enum):
