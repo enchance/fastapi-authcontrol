@@ -1,18 +1,20 @@
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Union
 
 from pydantic import BaseModel
 from fastapi_users import models
-from fastapi_users.db import TortoiseBaseUserModel
+from fastapi_users.db import TortoiseBaseUserModel, tortoise
 from tortoise import fields, models as tmodels
 
 from app.core.utils import model_str
+from app.core.models import DTMixin
 
 
 
 """
 DB
 """
-class UserMod(TortoiseBaseUserModel):
+class UserMod(DTMixin, TortoiseBaseUserModel):
     username =    fields.CharField(max_length=50, null=True)
     first_name =  fields.CharField(max_length=191, default='')
     middle_name = fields.CharField(max_length=191, default='')
@@ -34,14 +36,13 @@ class UserMod(TortoiseBaseUserModel):
     
     is_verified = fields.BooleanField(default=False)
     last_login =  fields.DatetimeField(null=True)
-    deleted_at =  fields.DatetimeField(null=True)
-    updated_at =  fields.DatetimeField(auto_now=True)
-    created_at =  fields.DatetimeField(auto_now_add=True)
     
     groups = fields.ManyToManyField('models.Group', related_name='group_users',
                                     through='auth_user_groups', backward_key='user_id')
     permissions = fields.ManyToManyField('models.Permission', related_name='permission_users',
                                          through='auth_user_permissions', backward_key='user_id')
+    
+    starter_fields = [*tortoise.starter_fields, 'username', 'timezone', 'is_verified']
     
     class Meta:
         table = 'auth_user'
@@ -59,6 +60,11 @@ class UserMod(TortoiseBaseUserModel):
         else:
             return self.email.split('@')[0]
     
+    async def to_dict(self):
+        d = {}
+        for field in self.starter_fields:
+            d[field] = getattr(self, field)
+        return d
     
     # TODO: has_perm        
     async def has_perm(self, perm_code: str):
@@ -91,12 +97,14 @@ PYDANTIC
 """
 class User(models.BaseUser):
     username: str
+    timezone: str
+    is_verified: bool
     # pass
 
 
 class UserCreate(models.BaseUserCreate):
     username: str
-    
+
     # @validator('email')
     # def nonum(cls, email):
     #     if '5' in email:
@@ -109,8 +117,6 @@ class UserUpdate(User, models.BaseUserUpdate):
 
 
 class UserDB(User, models.BaseUserDB):
-    # is_verified: bool
-    # timezone: str
     pass
 
 

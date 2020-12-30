@@ -2,7 +2,6 @@ from typing import Optional
 from fastapi import APIRouter, Response, Depends, status, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.exceptions import HTTPException
-
 from fastapi_users.router.common import ErrorCode
 from tortoise.exceptions import DoesNotExist
 
@@ -12,7 +11,6 @@ from app.core.dependencies import unique_username, unique_email
 from app.AdminControl.models import UniqueFieldsRegistration
 from app.AuthControl import jwt_authentication, user_db, AuthControl
 from app.AuthControl.models import UserMod, Token
-
 
 router = APIRouter()
 # router.include_router(fapi_user.get_auth_router(jwt_authentication))
@@ -61,9 +59,8 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
 
 @router.post("/login")
 async def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends()):
-    user = await fapi_user.db.authenticate(credentials, ['id', 'username', 'email',
-                                                         'hashed_password', 'is_verified',
-                                                         'is_superuser', 'timezone'])
+    user = await fapi_user.db.authenticate(credentials, UserMod.starter_fields)
+    print(user)
     
     if user is None or not user.is_active:
         raise HTTPException(
