@@ -60,7 +60,10 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
 @router.post("/login")
 async def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends()):
     user = await fapi_user.db.authenticate(credentials, UserMod.starter_fields)
-    print(user)
+    # print(user)
+    
+    if not user.is_verified:
+        return dict(is_verified=False)
     
     if user is None or not user.is_active:
         raise HTTPException(

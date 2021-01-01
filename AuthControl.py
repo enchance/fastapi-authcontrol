@@ -27,9 +27,9 @@ class AuthControl:
         return secrets.token_hex(nbytes=nbytes)
 
     @staticmethod
-    def time_difference(*, start: datetime, end: datetime):
+    def _time_difference(expires: datetime, now: datetime = datetime.utcnow()):
         """Get the diff between 2 dates"""
-        diff = end - start
+        diff = expires - now
     
         return {
             'days': diff.days,
@@ -60,8 +60,7 @@ class AuthControl:
         
     @classmethod
     def expires(cls, expires: datetime, units: str = 'minutes'):
-        now = datetime.utcnow()
-        diff = cls.time_difference(start=now, end=expires)
+        diff = cls._time_difference(expires)
         return diff[units]
 
 
