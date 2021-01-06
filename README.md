@@ -8,6 +8,10 @@ Allows the user to implement JWT authentication in any FastAPI application.
 
 ## Changelog
 
+### v0.1.1 (January 6, 2021)
+
+Working functions for a basic JWT application: Login/out, Registert, access/refresh token management
+
 ### v0.1 (December 25, 2020)
 
 Making the AuthControl folder in the *auth-demo* app into its own git repo. Merry Christmas everyone!
