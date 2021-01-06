@@ -131,7 +131,7 @@ class UserDB(User, models.BaseUserDB):
     
     @validator('timezone', pre=True, always=True)
     def default_tz(cls, val):
-        return val or '+8:00'
+        return val or '+08:00'
 
     @validator('is_verified', pre=True, always=True)
     def default_ver(cls, val):
