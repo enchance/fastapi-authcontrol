@@ -1,4 +1,4 @@
-import secrets
+import secrets, pytz
 from datetime import timedelta
 from datetime import datetime
 from enum import Enum
@@ -27,8 +27,9 @@ class AuthControl:
         return secrets.token_hex(nbytes=nbytes)
 
     @staticmethod
-    def _time_difference(expires: datetime, now: datetime = datetime.utcnow()):
+    def _time_difference(expires: datetime, now: datetime = None):
         """Get the diff between 2 dates"""
+        now = now and now or datetime.now(tz=pytz.UTC)
         diff = expires - now
     
         return {
@@ -40,10 +41,10 @@ class AuthControl:
     
     @classmethod
     def refresh_cookie(cls, name: str, token: dict, **kwargs):
-        if token['expires'] <= datetime.utcnow():
+        if token['expires'] <= datetime.now(tz=pytz.UTC):
             raise ValueError('Cookie expires date must be greater than the date now')
         
-        expires = token['expires'] - datetime.utcnow()
+        expires = token['expires'] - datetime.now(tz=pytz.UTC)
         cookie_data = {
             'key': name,
             'value': token['value'],
@@ -70,10 +71,10 @@ class AuthControl:
         Create and save a new refresh token
         :param user Pydantic model for the user
         """
-        refresh_token = AuthControl.generate_refresh_token()
-        expires = datetime.utcnow() + timedelta(seconds=s.REFRESH_TOKEN_EXPIRE)
-    
         user = await UserMod.get(pk=user.id).only('id')
+        refresh_token = AuthControl.generate_refresh_token()
+        expires = datetime.now(tz=pytz.UTC) + timedelta(seconds=s.REFRESH_TOKEN_EXPIRE)
+        
         await Token.create(token=refresh_token, expires=expires, author=user)
         return {
             'value': refresh_token,
@@ -88,7 +89,7 @@ class AuthControl:
         :param user Pydantic model for the user
         """
         refresh_token = AuthControl.generate_refresh_token()
-        expires = datetime.utcnow() + timedelta(seconds=s.REFRESH_TOKEN_EXPIRE)
+        expires = datetime.now(tz=pytz.UTC) + timedelta(seconds=s.REFRESH_TOKEN_EXPIRE)
     
         token = await Token.get(author_id=user.id, is_blacklisted=False).only('id', 'token',
                                                                               'expires')

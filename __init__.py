@@ -9,7 +9,7 @@ from app.AdminControl.models import Group
 from .AuthControl import AuthControl
 
 
-__version__ = "0.1"
+__version__ = "0.1.0"
 __description__ = "AuthControl"
 __author__ = "DropkickDev"
 

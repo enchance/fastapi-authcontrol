@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from fastapi_users import models
 from fastapi_users.db import TortoiseBaseUserModel, tortoise
 from tortoise import fields, models as tmodels
@@ -96,6 +96,10 @@ class Token(tmodels.Model):
 PYDANTIC
 """
 class User(models.BaseUser):
+    """
+    GETTING THE DATA:
+    Will be a part of the user object + default fields.
+    Your new fields in starter_fields might go here."""
     username: str
     timezone: str
     is_verified: bool
@@ -103,13 +107,12 @@ class User(models.BaseUser):
 
 
 class UserCreate(models.BaseUserCreate):
+    """
+    REGISTRATION FORM:
+    Anything besides the defaults will go here. Defaults are email password.
+    One of your starter_fields might go here.
+    """
     username: str
-
-    # @validator('email')
-    # def nonum(cls, email):
-    #     if '5' in email:
-    #         raise ValueError('No number 5 allowed.')
-    #     return email
 
 
 class UserUpdate(User, models.BaseUserUpdate):
@@ -117,9 +120,24 @@ class UserUpdate(User, models.BaseUserUpdate):
 
 
 class UserDB(User, models.BaseUserDB):
-    pass
+    """
+    SETTING THE DATA:
+    If the field is in UserCreate then it will be populated via the reg form. Required/Optional.
+    If the field is NOT in UserCreate then you'll have to populate it manually for new
+    registrations. Optional."""
+    username: str                 # Populate via form (UserCreate)
+    timezone: Optional[str]       # Populate via validator
+    is_verified: Optional[bool]   # Populate via validator
+    
+    @validator('timezone', pre=True, always=True)
+    def default_tz(cls, _):
+        return '+21:00'
 
-
+    @validator('is_verified', pre=True, always=True)
+    def default_ver(cls, _):
+        return True
+    
+    
 class TokenCreate(BaseModel):
     id: int
     token: str

@@ -32,11 +32,12 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
             raise Exception
 
         # TODO: Access the cache instead of querying it
-        token = await Token.get(token=refresh_token, is_blacklisted=False).only('expires',
-                                                                                'author_id')
+        token = await Token.get(token=refresh_token, is_blacklisted=False)\
+            .only('id', 'expires', 'author_id')
         user = await user_db.get(token.author_id)
         
         mins = AuthControl.expires(token.expires)
+        # print(mins)
         if mins <= 0:
             raise Exception
         elif mins <= s.REFRESH_TOKEN_CUTOFF:
@@ -60,10 +61,9 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
 @router.post("/login")
 async def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends()):
     user = await fapi_user.db.authenticate(credentials, UserMod.starter_fields)
-    # print(user)
     
-    if not user.is_verified:
-        return dict(is_verified=False)
+    # if not user.is_verified:
+    #     return dict(is_verified=False)
     
     if user is None or not user.is_active:
         raise HTTPException(
@@ -82,9 +82,10 @@ async def login(response: Response, credentials: OAuth2PasswordRequestForm = Dep
     # TODO: Save user's permissions to cache
     # TODO: Save user's groups to cache
     # TODO: Save user data to cache
-    data = {}
-    data.update(await jwt_authentication.get_login_response(user, response))
-    return data
+    # data = {}
+    # data.update()
+    # return data
+    return await jwt_authentication.get_login_response(user, response)
 
 
 @router.get("/logout", dependencies=[Depends(fapi_user.get_current_active_user)])
