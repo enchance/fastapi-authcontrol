@@ -62,8 +62,8 @@ async def new_access_token(response: Response, refresh_token: Optional[str] = Co
 async def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends()):
     user = await fapi_user.db.authenticate(credentials, UserMod.starter_fields)
     
-    # if not user.is_verified:
-    #     return dict(is_verified=False)
+    if not user.is_verified:
+        return dict(is_verified=False)
     
     if user is None or not user.is_active:
         raise HTTPException(
@@ -82,10 +82,11 @@ async def login(response: Response, credentials: OAuth2PasswordRequestForm = Dep
     # TODO: Save user's permissions to cache
     # TODO: Save user's groups to cache
     # TODO: Save user data to cache
-    # data = {}
-    # data.update()
-    # return data
-    return await jwt_authentication.get_login_response(user, response)
+    data = {
+        **await jwt_authentication.get_login_response(user, response),
+        'is_verified': user.is_verified
+    }
+    return data
 
 
 @router.get("/logout", dependencies=[Depends(fapi_user.get_current_active_user)])

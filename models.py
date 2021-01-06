@@ -130,12 +130,12 @@ class UserDB(User, models.BaseUserDB):
     is_verified: Optional[bool]   # Populate via validator
     
     @validator('timezone', pre=True, always=True)
-    def default_tz(cls, _):
-        return '+21:00'
+    def default_tz(cls, val):
+        return val or '+8:00'
 
     @validator('is_verified', pre=True, always=True)
-    def default_ver(cls, _):
-        return True
+    def default_ver(cls, val):
+        return val or False
     
     
 class TokenCreate(BaseModel):
